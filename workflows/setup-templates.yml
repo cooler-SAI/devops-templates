@@ -1,0 +1,23 @@
+# In any project inside .github/workflows/setup-templates.yml:
+name: Setup DevOps Templates
+
+on:
+  workflow_dispatch:  # Main run
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Secure Pipeline
+        uses: cooler-SAI/devops-templates/.github/actions/setup-templates@main
+        with:
+          template: secure-container
+
+      - name: Setup Security Scanning
+        uses: cooler-SAI/devops-templates/.github/actions/setup-templates@main
+        with:
+          template: security-scan
+          output-dir: .github/workflows

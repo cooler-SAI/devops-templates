@@ -1,0 +1,40 @@
+# .github/workflows/security-scan.yml
+name: 🔍 Security Scan Suite
+
+on:
+  workflow_call:
+    inputs:
+      scan-type:
+        required: false
+        type: choice
+        options:
+          - full
+          - fast
+          - secrets
+        default: fast
+
+jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Trivy Filesystem Scan
+        uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-fs-results.sarif'
+
+      - name: Gitleaks Secret Detection
+        uses: gitleaks/gitleaks-action@v2
+        if: inputs.scan-type == 'full' || inputs.scan-type == 'secrets'
+
+      - name: Upload Scan Results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-fs-results.sarif'

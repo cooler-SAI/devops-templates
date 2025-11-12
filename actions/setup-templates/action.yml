@@ -1,0 +1,43 @@
+# .github/actions/setup-templates/action.yml
+name: 'Setup DevOps Templates'
+description: 'Copy templates from devops-templates repository'
+
+inputs:
+  template:
+    description: 'Template to copy'
+    required: true
+    default: 'secure-container'
+    options:
+      - secure-container
+      - k8s-deploy
+      - security-scan
+  output-dir:
+    description: 'Output directory'
+    required: false
+    default: '.github/workflows'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download template
+      shell: bash
+      run: |
+        TEMPLATE_URL="https://raw.githubusercontent.com/cooler-SAI/devops-templates/main/.github/workflows/${{ inputs.template }}.yml"
+        OUTPUT_PATH="${{ inputs.output-dir }}/build.yml"
+        
+        echo "📥 Downloading template: ${{ inputs.template }}"
+        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+             -H "Accept: application/vnd.github.v3.raw" \
+             -o "$OUTPUT_PATH" \
+             "$TEMPLATE_URL"
+        
+        echo "✅ Template copied to: $OUTPUT_PATH"
+        echo "🛠️ Remember to customize IMAGE_NAME and other project-specific values!"
+
+    - name: Validate download
+      shell: bash
+      run: |
+        if [ ! -f "${{ inputs.output-dir }}/build.yml" ]; then
+          echo "❌ Failed to download template"
+          exit 1
+        fi

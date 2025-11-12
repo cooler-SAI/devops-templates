@@ -1,0 +1,10 @@
+name: 🚀 CI/CD Pipeline
+
+on: [push]
+
+jobs:
+  build-and-scan:
+    uses: cooler-SAI/devops-templates/.github/workflows/secure-container.yml@main
+    with:
+      image-name: cool-frontend
+      docker-context: .
